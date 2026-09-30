@@ -1,16 +1,21 @@
+import io
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import requests
 import streamlit as st
 
 st.title("Sign Language MNIST Predictor")
 
 
-# Direct reliable URL to Sign Language MNIST Test CSV
+# Fetch dataset using requests with a valid browser User-Agent
 @st.cache_data
 def load_data():
     url = "https://raw.githubusercontent.com/leekanghee/Sign-Language-MNIST/master/sign_mnist_test.csv"
-    return pd.read_csv(url)
+    headers = {"User-Agent": "Mozilla/5.0"}
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+    return pd.read_csv(io.StringIO(response.text))
 
 
 data = load_data()
