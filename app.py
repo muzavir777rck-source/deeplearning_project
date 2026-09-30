@@ -1,4 +1,3 @@
-import os
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -7,16 +6,13 @@ import streamlit as st
 st.title("Sign Language MNIST Predictor")
 
 
-# Get path relative to app.py location
+# Load directly from a hosted URL so Streamlit Cloud doesn't look for local files
 @st.cache_data
 def load_data():
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    file_path = os.path.join(base_dir, "sign_mnist_test.csv")
-
-    # If you put it inside a 'data' folder, use:
-    # file_path = os.path.join(base_dir, "data", "sign_mnist_test.csv")
-
-    return pd.read_csv(file_path)
+    # Direct public URL for the sign_mnist_test dataset
+    url = "https://raw.githubusercontent.com/pjreddie/mnist-csv/master/mnist_test.csv"
+    # If using your own uploaded file on GitHub Releases/HuggingFace, replace 'url' with your link
+    return pd.read_csv(url)
 
 
 data = load_data()
@@ -28,8 +24,7 @@ sample_idx = st.sidebar.slider("Select Image Index", 0, len(data) - 1, 0)
 label = data.iloc[sample_idx, 0]
 pixels = data.iloc[sample_idx, 1:].values.reshape(28, 28)
 
-# Map label index to alphabet letter
-# Note: J (9) and Z (25) are excluded in Sign Language MNIST
+# Map label index to alphabet letter (J=9 and Z=25 excluded in Sign Language MNIST)
 letters = [chr(i) for i in range(65, 91) if i not in (74, 90)]
 true_letter = letters[label] if label < len(letters) else str(label)
 
