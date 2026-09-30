@@ -1,4 +1,5 @@
 import io
+import os
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -8,12 +9,19 @@ import streamlit as st
 st.title("Sign Language MNIST Predictor")
 
 
-# Fetch dataset using requests with a valid browser User-Agent
 @st.cache_data
 def load_data():
-    url = "https://raw.githubusercontent.com/leekanghee/Sign-Language-MNIST/master/sign_mnist_test.csv"
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    local_path = os.path.join(base_dir, "sign_mnist_test.csv")
+
+    # 1. Try loading locally if file is uploaded to GitHub repo
+    if os.path.exists(local_path):
+        return pd.read_csv(local_path)
+
+    # 2. Fallback to reliable public CDN
+    backup_url = "https://cdn.jsdelivr.net/gh/datamining-lab/dataset/sign_mnist_test.csv"
     headers = {"User-Agent": "Mozilla/5.0"}
-    response = requests.get(url, headers=headers)
+    response = requests.get(backup_url, headers=headers)
     response.raise_for_status()
     return pd.read_csv(io.StringIO(response.text))
 
@@ -27,7 +35,7 @@ sample_idx = st.sidebar.slider("Select Image Index", 0, len(data) - 1, 0)
 label = data.iloc[sample_idx, 0]
 pixels = data.iloc[sample_idx, 1:].values.reshape(28, 28)
 
-# Map label index to alphabet letter (J=9 and Z=25 excluded in dataset)
+# Map label index to alphabet letter (J=9 and Z=25 excluded)
 letters = [chr(i) for i in range(65, 91) if i not in (74, 90)]
 true_letter = letters[label] if label < len(letters) else str(label)
 
