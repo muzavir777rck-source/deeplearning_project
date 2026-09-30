@@ -1,15 +1,23 @@
-import streamlit as st
-import pandas as pd
-import numpy as np
+import os
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import streamlit as st
 
 st.title("Sign Language MNIST Predictor")
 
-# Load data with caching for fast performance
+
+# Get path relative to app.py location
 @st.cache_data
 def load_data():
-    df = pd.read_csv(r"C:\Users\user\Downloads\sign_mnist_test\sign_mnist_test.csv")
-    return df
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(base_dir, "sign_mnist_test.csv")
+
+    # If you put it inside a 'data' folder, use:
+    # file_path = os.path.join(base_dir, "data", "sign_mnist_test.csv")
+
+    return pd.read_csv(file_path)
+
 
 data = load_data()
 
